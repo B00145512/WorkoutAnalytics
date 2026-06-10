@@ -1,12 +1,5 @@
-import cv2
-import cvzone
-import numpy as np
-import mediapipe as mp
-import matplotlib.pyplot as plt
-import cvzone.PlotModule as LivePlot
-from cvzone.PoseModule import PoseDetector
 from tkinter import *
-from Exercise import curl
+from Exercise import curl, squat, tricep_extension
 
 # Works best on Python 3.12
 """
@@ -47,7 +40,7 @@ from Exercise import curl
 # Start by showing a window to select exercise
 select_window = Tk()
 select_window.title("Workout Analyser")
-select_window.geometry("600x300")
+select_window.geometry("700x450")
 icon = PhotoImage(file="WA.png")
 select_window.iconphoto(True, icon)
 select_window.configure(bg="#ffeaea")
@@ -56,33 +49,15 @@ title = Label(select_window, text="Welcome, select what you'd like to train!",
               font=("Blaka", 25, "bold"), bg="#ffeaea",image=icon, compound="bottom")
 title.pack()
 curl_button = Button(select_window, text="Bicep Curl")
-curl_button.config(command=curl, font=("Ariel", 15, "bold"), activebackground="#ffeaea")
+curl_button.config(command=curl, font=("Ariel", 15, "bold"), activebackground="#ffeaea", compound="left")
 curl_button.pack()
 
+tricep_button = Button(select_window, text="Tricep Extension")
+tricep_button.config(command=tricep_extension, font=("Ariel", 15, "bold"), activebackground="#ffeaea", compound="left")
+tricep_button.pack()
+
+squat_button = Button(select_window, text="Squat")
+squat_button.config(command=squat, font=("Ariel", 15, "bold"), activebackground="#ffeaea", compound="left")
+squat_button.pack()
+
 select_window.mainloop()
-
-"""
-idList = [0, 7, 8, 11,12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
-detector = PoseDetector()
-cap = cv2.VideoCapture(0)
-while cap.isOpened():
-    success, image = cap.read()
-    if not success:
-        break
-
-    image = detector.findPose(image)
-    lmList, bboxInfo = detector.findPosition(image, draw=False)
-
-    for lm in lmList:
-        if lm[0] in idList:
-            x, y = lm[1], lm[2]
-            cv2.circle(image, (x, y), 3, (0, 255, 0), cv2.FILLED)
-
-    cv2.imshow('Real time window', image)
-    if cv2.waitKey(5) & 0xFF == ord('q'):
-        break
-
-cap.release()
-cv2.destroyAllWindows()
-"""
-
