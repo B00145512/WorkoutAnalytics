@@ -17,7 +17,6 @@ def curl():
             success, frame = cap.read()
             if not success:
                 break
-            
             #Recolour to RGB
             image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             image.flags.writeable = False
@@ -29,9 +28,6 @@ def curl():
 
             #mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
             draw_landmarks(image, results)
-
-
-
 
             cv2.imshow('Real time window', image)
             if cv2.waitKey(5) & 0xFF == ord('q'):
@@ -87,22 +83,36 @@ def draw_landmarks(image, results):
         h, w, _ = image.shape
         lm = results.pose_landmarks.landmark
 
-        # Option B — access by index (same as enum values)
         left_shoulder = lm[11]
         right_shoulder = lm[12]
         left_elbow = lm[13]
         right_elbow = lm[14]
         left_wrist = lm[15]
         right_wrist = lm[16]
-
+        #print("Shoulder: ",left_shoulder)
+        #print("Wrist: ",left_wrist)
+        #print("Elbow: ",left_elbow)
         pts = {'L_shoulder': left_shoulder,
                 'R_shoulder': right_shoulder,
                 'L_elbow': left_elbow,
                 'R_elbow': right_elbow,
                 'L_wrist': left_wrist,
                 'R_wrist': right_wrist}
+        print(find_angle([left_shoulder.x, left_shoulder.y], [left_elbow.x, left_elbow.y], [left_wrist.x, left_wrist.y]))
         for name, l in pts.items():
             x_px, y_px = int(l.x * w), int(l.y * h)
             cv2.circle(image, (x_px, y_px), 6, (0, 255, 0), -1)
             cv2.putText(image, name, (x_px + 6, y_px - 6),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 1)
+def find_angle(a, b, c):
+    a = np.array(a)  # First
+    b = np.array(b)  # Mid
+    c = np.array(c)  # End
+
+    radians = np.arctan2(c[1] - b[1], c[0] - b[0]) - np.arctan2(a[1] - b[1], a[0] - b[0])
+    angle = np.abs(radians * 180.0 / np.pi)
+
+    if angle > 180.0:
+        angle = 360 - angle
+
+    return angle

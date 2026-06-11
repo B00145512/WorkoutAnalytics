@@ -38,6 +38,8 @@ from Exercise import curl, squat, tricep_extension
 32 - right foot index
 """
 # Start by showing a window to select exercise
+curl()
+'''
 select_window = Tk()
 select_window.title("Workout Analyser")
 select_window.geometry("700x450")
@@ -61,3 +63,4 @@ squat_button.config(command=squat, font=("Ariel", 15, "bold"), activebackground=
 squat_button.pack()
 
 select_window.mainloop()
+'''
