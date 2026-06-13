@@ -1,5 +1,5 @@
 from tkinter import *
-from Exercise import curl, squat, tricep_extension
+from Exercises.Curl import curl
 
 # Works best on Python 3.12
 """
