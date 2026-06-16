@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import cvzone.PlotModule as LivePlot
 from cvzone.PoseModule import PoseDetector
 import Utils.find_angle
+import Utils.draw_landmarks
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
@@ -60,7 +61,4 @@ def draw_landmarks(image, results):
                 'R_wrist': right_wrist}
         print(Utils.find_angle.find_angle([left_shoulder.x, left_shoulder.y], [left_elbow.x, left_elbow.y], [left_wrist.x, left_wrist.y]))
         for name, l in pts.items():
-            x_px, y_px = int(l.x * w), int(l.y * h)
-            cv2.circle(image, (x_px, y_px), 6, (0, 255, 0), -1)
-            cv2.putText(image, name, (x_px + 6, y_px - 6),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 1)
+            draw_landmarks(image, l)

@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ebbc1643-1ef5-45d5-b23e-e75c1995ec80" name="Changes" comment="" />
+    <list default="true" id="ebbc1643-1ef5-45d5-b23e-e75c1995ec80" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Utils/draw_landmarks.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Utils/spine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exercises/Curl.py" beforeDir="false" afterPath="$PROJECT_DIR$/Exercises/Curl.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -60,6 +65,7 @@
       <updated>1780933942426</updated>
       <workItem from="1780933943437" duration="823000" />
       <workItem from="1781013053817" duration="3664000" />
+      <workItem from="1781623300593" duration="1413000" />
     </task>
     <servers />
   </component>
