@@ -1,15 +1,4 @@
-import cv2
-import cvzone
-import numpy as np
-import mediapipe as mp
-import matplotlib.pyplot as plt
-import cvzone.PlotModule as LivePlot
-from cvzone.PoseModule import PoseDetector
-from pyparsing import results
-
-import Utils.find_angle
-import draw_landmarks
-from Utils.find_angle import find_angle
+from Utils.show_points_and_lines import connect_landmarks, draw_points
 
 
 def draw_spine(image, results):
@@ -26,5 +15,16 @@ def draw_spine(image, results):
                'right_shoulder': right_shoulder,
                'left_hip': left_hip,
                'right_hip': right_hip}
-    for name, l in pts.items():
-        draw_landmarks(image, l)
+
+        neck = (int(((left_shoulder.x + right_shoulder.x)/2)*w),
+                int(((left_shoulder.y + right_shoulder.y)/2)*h)
+        )
+        stomach = (int(((left_hip.x + right_hip.x)/2)*w),
+                   int(((left_hip.y + right_hip.y)/2)*h)
+        )
+
+
+        connect_landmarks(image, left_shoulder, right_shoulder, w ,h)
+        connect_landmarks(image, neck, stomach, w ,h)
+        for name, l in pts.items():
+            draw_points(image, l, name, w, h)

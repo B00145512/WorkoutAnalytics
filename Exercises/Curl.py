@@ -5,12 +5,14 @@ import mediapipe as mp
 import matplotlib.pyplot as plt
 import cvzone.PlotModule as LivePlot
 from cvzone.PoseModule import PoseDetector
-import Utils.find_angle
-import Utils.draw_landmarks
+
+from Utils import find_angle
+from Utils.show_points_and_lines import draw_points, connect_landmarks
+from Utils.find_angle import find_angle
+from Utils.spine import draw_spine
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
-idList = [0, 7, 8, 11,12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
 detector = PoseDetector()
 cap = cv2.VideoCapture(0)
 
@@ -50,15 +52,26 @@ def draw_landmarks(image, results):
         right_elbow = lm[14]
         left_wrist = lm[15]
         right_wrist = lm[16]
-        #print("Shoulder: ",left_shoulder)
-        #print("Wrist: ",left_wrist)
-        #print("Elbow: ",left_elbow)
+        left_hip = lm[23]
+        right_hip = lm[24]
+
         pts = {'L_shoulder': left_shoulder,
                 'R_shoulder': right_shoulder,
                 'L_elbow': left_elbow,
                 'R_elbow': right_elbow,
                 'L_wrist': left_wrist,
-                'R_wrist': right_wrist}
-        print(Utils.find_angle.find_angle([left_shoulder.x, left_shoulder.y], [left_elbow.x, left_elbow.y], [left_wrist.x, left_wrist.y]))
+                'R_wrist': right_wrist,
+                'L_hip': left_hip,
+                'R_hip': right_hip}
+
+        print("Left Bicep: ",find_angle([left_shoulder.x, left_shoulder.y], [left_elbow.x, left_elbow.y], [left_wrist.x, left_wrist.y]))
+        print("Right Bicep: ",find_angle([right_shoulder.x, right_shoulder.y], [right_elbow.x, right_elbow.y], [right_wrist.x, right_wrist.y]))
         for name, l in pts.items():
-            draw_landmarks(image, l)
+            draw_points(image, l, name, w,h)
+
+        connect_landmarks(image, left_shoulder, left_elbow, w, h)
+        connect_landmarks(image, right_shoulder, right_elbow, w, h)
+        connect_landmarks(image, left_wrist, left_elbow, w, h)
+        connect_landmarks(image, right_wrist, right_elbow, w, h)
+        connect_landmarks(image, left_shoulder, right_shoulder, w ,h)
+        draw_spine(image, results)

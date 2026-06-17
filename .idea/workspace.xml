@@ -2,10 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ebbc1643-1ef5-45d5-b23e-e75c1995ec80" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Utils/draw_landmarks.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Utils/spine.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Utils/bicep.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Utils/show_points_and_lines.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exercises/Curl.py" beforeDir="false" afterPath="$PROJECT_DIR$/Exercises/Curl.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Utils/draw_landmarks.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Utils/spine.py" beforeDir="false" afterPath="$PROJECT_DIR$/Utils/spine.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,19 +33,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Mateusz/Desktop/MASTERS/SEMESTER3/WorkoutAnalytics&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.Curl.executor": "Run",
+    "Python.bicep.executor": "Run",
+    "Python.main.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/Mateusz/Desktop/MASTERS/SEMESTER3/WorkoutAnalytics",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Mateusz\Desktop\MASTERS\SEMESTER3\WorkoutAnalytics" />
@@ -65,7 +69,8 @@
       <updated>1780933942426</updated>
       <workItem from="1780933943437" duration="823000" />
       <workItem from="1781013053817" duration="3664000" />
-      <workItem from="1781623300593" duration="1413000" />
+      <workItem from="1781623300593" duration="1526000" />
+      <workItem from="1781653193082" duration="2808000" />
     </task>
     <servers />
   </component>
@@ -73,6 +78,8 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/WorkoutAnalytics$main.coverage" NAME="main Coverage Results" MODIFIED="1781016561841" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/WorkoutAnalytics$bicep.coverage" NAME="bicep Coverage Results" MODIFIED="1781654680887" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Utils" />
+    <SUITE FILE_PATH="coverage/WorkoutAnalytics$Curl.coverage" NAME="Curl Coverage Results" MODIFIED="1781655712531" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Exercises" />
+    <SUITE FILE_PATH="coverage/WorkoutAnalytics$main.coverage" NAME="main Coverage Results" MODIFIED="1781656002041" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
