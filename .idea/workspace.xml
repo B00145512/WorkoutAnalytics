@@ -67,7 +67,8 @@
       <workItem from="1781013053817" duration="3664000" />
       <workItem from="1781623300593" duration="1526000" />
       <workItem from="1781653193082" duration="3071000" />
-      <workItem from="1783449684041" duration="4590000" />
+      <workItem from="1783449684041" duration="4824000" />
+      <workItem from="1783965712080" duration="10000" />
     </task>
     <servers />
   </component>
@@ -76,7 +77,7 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/WorkoutAnalytics$bicep.coverage" NAME="bicep Coverage Results" MODIFIED="1781654680887" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Utils" />
-    <SUITE FILE_PATH="coverage/WorkoutAnalytics$Curl.coverage" NAME="Curl Coverage Results" MODIFIED="1783454825527" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Exercises" />
-    <SUITE FILE_PATH="coverage/WorkoutAnalytics$main.coverage" NAME="main Coverage Results" MODIFIED="1783454830854" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/WorkoutAnalytics$Curl.coverage" NAME="Curl Coverage Results" MODIFIED="1783454961371" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Exercises" />
+    <SUITE FILE_PATH="coverage/WorkoutAnalytics$main.coverage" NAME="main Coverage Results" MODIFIED="1783455003888" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
