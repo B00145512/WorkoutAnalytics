@@ -15,13 +15,15 @@ from Utils import find_angle
 from Utils.show_points_and_lines import draw_points, connect_landmarks
 from Utils.find_angle import find_angle
 from Utils.spine import draw_spine
+from Utils.FindDistance import find_velocity
+from Utils.FindDistance import find_velocity_nodt
 
-mp_drawing = mp.solutions.drawing_utils
-mp_pose = mp.solutions.pose
-detector = PoseDetector()
-cap = cv2.VideoCapture(0)
-cur_time = datetime.datetime.now()
-filename = os.path.join("exercise_hist","Curl",f"curl_{cur_time:%Y-%m-%d_%H-%M}.csv")
+mp_drawing  = mp.solutions.drawing_utils
+mp_pose     = mp.solutions.pose
+detector    = PoseDetector()
+cap         = cv2.VideoCapture(0)
+cur_time    = datetime.datetime.now()
+filename    = os.path.join("exercise_hist","Curl",f"curl_{cur_time:%Y-%m-%d_%H-%M}.csv")
 
 def curl():
     with open(filename, "w",newline="") as file:
@@ -32,20 +34,22 @@ def curl():
             "Left Elbow Angle","Right Elbow Angle","Left Shoulder Angle","Right Shoulder Angle","Torso Angle",
             "Left Angular Velocity","Right Angular Velocity",
             "Left Wrist Velocity","Right Wrist Velocity",
-            "Left Elbow Velocity","Right Elbow Velocity"])
+            "Left Elbow Velocity","Right Elbow Velocity",
+            "Left Elbow Drift", "Right Elbow Drift"])
         # Initialise values
-        start_time = time.time()
-        frame_count = 1
-        prev_left_angle = None
-        prev_right_angle = None
-        prev_left_wrist = None
-        prev_right_wrist = None
-        prev_time = None
-        prev_left_elbow = None
-        prev_right_elbow = None
-        stage = "down"
-        rep_count = 0
-        current_rep = []
+        start_time          = time.time()
+        frame_count         = 1
+        prev_left_angle     = None
+        prev_right_angle    = None
+        prev_left_wrist     = None
+        prev_right_wrist    = None
+        prev_time           = None
+        prev_left_elbow     = None
+        prev_right_elbow    = None
+        stage               = "down"
+        rep_count           = 0
+        current_rep         = []
+        rep_duration        = time.time()
 
         with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
             while cap.isOpened():
@@ -137,7 +141,8 @@ def curl():
             cv2.destroyAllWindows()
 
 
-def draw_landmarks(image, results, timestamp, prev_time, prev_left_angle, prev_right_angle, prev_left_wrist, prev_right_wrist, prev_left_elbow, prev_right_elbow):
+def draw_landmarks(image, results, timestamp,
+                    prev_time, prev_left_angle, prev_right_angle, prev_left_wrist, prev_right_wrist, prev_left_elbow, prev_right_elbow):
 
     if not results.pose_landmarks:
         return None
@@ -145,26 +150,26 @@ def draw_landmarks(image, results, timestamp, prev_time, prev_left_angle, prev_r
     h, w, _ = image.shape
     lm = results.pose_landmarks.landmark
 
-    left_shoulder = lm[11]
-    right_shoulder = lm[12]
-    left_elbow = lm[13]
-    right_elbow = lm[14]
-    left_wrist = lm[15]
-    right_wrist = lm[16]
-    left_hip = lm[23]
-    right_hip = lm[24]
-    left_knee = lm[25]
-    
+    left_shoulder   = lm[11]
+    right_shoulder  = lm[12]
+    left_elbow      = lm[13]
+    right_elbow     = lm[14]
+    left_wrist      = lm[15]
+    right_wrist     = lm[16]
+    left_hip        = lm[23]
+    right_hip       = lm[24]
+    left_knee       = lm[25]
+
     # Draw skeleton
     pts = {
-        "L_shoulder": left_shoulder,
-        "R_shoulder": right_shoulder,
-        "L_elbow": left_elbow,
-        "R_elbow": right_elbow,
-        "L_wrist": left_wrist,
-        "R_wrist": right_wrist,
-        "L_hip": left_hip,
-        "R_hip": right_hip
+        "L_shoulder":   left_shoulder,
+        "R_shoulder":   right_shoulder,
+        "L_elbow":      left_elbow,
+        "R_elbow":      right_elbow,
+        "L_wrist":      left_wrist,
+        "R_wrist":      right_wrist,
+        "L_hip":        left_hip,
+        "R_hip":        right_hip
     }
 
     for name, p in pts.items():
@@ -196,13 +201,16 @@ def draw_landmarks(image, results, timestamp, prev_time, prev_left_angle, prev_r
                              [left_knee.x, left_knee.y])
 
     # Find Velocity of current joints based on previous frame
-    dt = 0
-    left_ang_vel = 0
-    right_ang_vel = 0
-    left_elbow_vel = 0
+    dt              = 0
+    left_ang_vel    = 0
+    right_ang_vel   = 0
+    left_elbow_vel  = 0
     right_elbow_vel = 0
-    left_wrist_vel = 0
+    left_wrist_vel  = 0
     right_wrist_vel = 0
+
+    left_elbow_drift = 0
+    right_elbow_drift = 0
 
     if prev_time is not None:
         dt = timestamp - prev_time
@@ -214,39 +222,28 @@ def draw_landmarks(image, results, timestamp, prev_time, prev_left_angle, prev_r
         if prev_right_angle is not None:
             right_ang_vel = (right_angle - prev_right_angle) / dt
 
-    if dt > 0:
-        if prev_left_wrist is not None:
-            dx = left_wrist.x - prev_left_wrist[0]
-            dy = left_wrist.y - prev_left_wrist[1]
-            left_wrist_vel = np.sqrt(dx**2 + dy**2) / dt
+    # find velocity of joints
+    left_wrist_vel  = find_velocity((left_wrist.x, left_wrist.y), prev_left_wrist, dt)
+    right_wrist_vel = find_velocity((right_wrist.x, right_wrist.y),prev_right_wrist, dt)
+    left_elbow_vel  = find_velocity((left_elbow.x, left_elbow.y), prev_left_elbow, dt)
+    right_elbow_vel = find_velocity((right_elbow.x, right_elbow.y), prev_right_elbow, dt)
 
-        if prev_right_wrist is not None:
-            dx = right_wrist.x - prev_right_wrist[0]
-            dy = right_wrist.y - prev_right_wrist[1]
-            right_wrist_vel = np.sqrt(dx**2 + dy**2) / dt
-
-    if dt > 0:
-        if prev_left_elbow is not None:
-            dx = left_elbow.x - prev_left_elbow[0]
-            dy = left_elbow.y - prev_left_elbow[1]
-            left_elbow_vel = np.sqrt(dx**2 + dy**2) / dt
-
-        if prev_right_elbow is not None:
-            dx = right_elbow.x - prev_right_elbow[0]
-            dy = right_elbow.y - prev_right_elbow[1]
-            right_elbow_vel = np.sqrt(dx**2 + dy**2) / dt
+    # find elbow drift
+    left_elbow_drift = find_velocity_nodt((left_elbow.x, left_elbow.y), prev_left_elbow)
+    right_elbow_drift = find_velocity_nodt((right_elbow.x, right_elbow.y), prev_right_elbow)
 
     return {
-        "left_shoulder_x": left_shoulder.x, "left_shoulder_y": left_shoulder.y,
-        "left_elbow_x": left_elbow.x, "left_elbow_y": left_elbow.y,
-        "left_wrist_x": left_wrist.x, "left_wrist_y": left_wrist.y,
-        "right_shoulder_x": right_shoulder.x, "right_shoulder_y": right_shoulder.y,
-        "right_elbow_x": right_elbow.x, "right_elbow_y": right_elbow.y,
-        "right_wrist_x": right_wrist.x, "right_wrist_y": right_wrist.y,
-        "left_elbow_angle": left_angle, "right_elbow_angle": right_angle,
-        "left_shoulder_angle": left_shoulder_angle, "right_shoulder_angle": right_shoulder_angle,
-        "torso_angle": torso_angle,
-        "left_ang_velocity": left_ang_vel, "right_ang_velocity": right_ang_vel,
-        "left_wrist_velocity": left_wrist_vel, "right_wrist_velocity": right_wrist_vel,
-        "left_elbow_velocity": left_elbow_vel,"right_elbow_velocity": right_elbow_vel
+        "left_shoulder_x":      left_shoulder.x,    "left_shoulder_y":      left_shoulder.y,
+        "left_elbow_x":         left_elbow.x,       "left_elbow_y":         left_elbow.y,
+        "left_wrist_x":         left_wrist.x,       "left_wrist_y":         left_wrist.y,
+        "right_shoulder_x":     right_shoulder.x,   "right_shoulder_y":     right_shoulder.y,
+        "right_elbow_x":        right_elbow.x,      "right_elbow_y":        right_elbow.y,
+        "right_wrist_x":        right_wrist.x,      "right_wrist_y":        right_wrist.y,
+        "left_elbow_angle":     left_angle,         "right_elbow_angle":    right_angle,
+        "left_shoulder_angle":  left_shoulder_angle,"right_shoulder_angle": right_shoulder_angle,
+        "torso_angle":          torso_angle,
+        "left_ang_velocity":    left_ang_vel,       "right_ang_velocity":   right_ang_vel,
+        "left_wrist_velocity":  left_wrist_vel,     "right_wrist_velocity": right_wrist_vel,
+        "left_elbow_velocity":  left_elbow_vel,     "right_elbow_velocity": right_elbow_vel,
+        "left_elbow_drift":     left_elbow_drift,   "right_elbow_drift":    right_elbow_drift
     }
