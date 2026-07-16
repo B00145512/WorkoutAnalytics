@@ -26,7 +26,7 @@ filename = os.path.join("exercise_hist","Curl",f"curl_{cur_time:%Y-%m-%d_%H-%M}.
 def curl():
     with open(filename, "w",newline="") as file:
         writer = csv.writer(file)
-        writer.writerow(["Frame", "Timestamp",
+        writer.writerow(["Frame","Rep","Timestamp",
             "Left Shoulder X","Left Shoulder Y","Left Elbow X","Left Elbow Y","Left Wrist X","Left Wrist Y",
             "Right Shoulder X", "Right Shoulder Y","Right Elbow X", "Right Elbow Y","Right Wrist X","Right Wrist Y",
             "Left Elbow Angle","Right Elbow Angle","Left Shoulder Angle","Right Shoulder Angle","Torso Angle",
@@ -43,6 +43,9 @@ def curl():
         prev_time = None
         prev_left_elbow = None
         prev_right_elbow = None
+        stage = "down"
+        rep_count = 0
+        current_rep = []
 
         with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
             while cap.isOpened():
@@ -54,12 +57,10 @@ def curl():
                 image.flags.writeable = False
                 #Make detection
                 results = pose.process(image)
-                #Recolour back to BGR
+                #Recolour back 
                 image.flags.writeable = True
                 image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-                #mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
-                #landmarks = draw_landmarks(image, results)
                 timestamp = time.time() - start_time
 
                 features = draw_landmarks(image,
@@ -72,20 +73,23 @@ def curl():
                                           prev_right_wrist,
                                           prev_left_elbow,
                                           prev_right_elbow)
-
-                cv2.imshow('Real time window', image)
-                if cv2.waitKey(5) & 0xFF == ord('q'):
-                    break
-                #if landmarks:
-                #    writer.writerow([frame_count] + landmarks)
+                
+                # If no features are found, continue without writing to CSV
+                if features is None:
+                    cv2.imshow('Real time window', image)
+                    if cv2.waitKey(5) & 0xFF == ord('q'):
+                        break
+                    continue
+                
+                # Write into CSV
                 if features:
                     writer.writerow(
-                        [frame_count, timestamp] +
+                        [frame_count, rep_count, timestamp] +
                         list(features.values())
                     )
 
+                    # Set new prev values using current ones
                     prev_time = timestamp
-
                     prev_left_angle = features["left_elbow_angle"]
                     prev_right_angle = features["right_elbow_angle"]
 
@@ -110,6 +114,24 @@ def curl():
                     )
 
                     frame_count += 1
+                
+                # Rep counter
+                current_rep.append(features)
+
+                arm_angle = features["left_elbow_angle"]
+                if arm_angle < 40 and stage == "down":
+                    stage = "up"
+                    #print("Up")
+                elif arm_angle > 150 and stage == "up":
+                    stage = "down"
+                    rep_count += 1
+                    #print("Down")
+
+                    #print("Rep Done Total reps: ", rep_count)
+                cv2.imshow("Real time window", image)
+
+                if cv2.waitKey(5) & 0xFF == ord("q"):
+                    break
 
             cap.release()
             cv2.destroyAllWindows()
@@ -215,7 +237,6 @@ def draw_landmarks(image, results, timestamp, prev_time, prev_left_angle, prev_r
             right_elbow_vel = np.sqrt(dx**2 + dy**2) / dt
 
     return {
-
         "left_shoulder_x": left_shoulder.x, "left_shoulder_y": left_shoulder.y,
         "left_elbow_x": left_elbow.x, "left_elbow_y": left_elbow.y,
         "left_wrist_x": left_wrist.x, "left_wrist_y": left_wrist.y,
