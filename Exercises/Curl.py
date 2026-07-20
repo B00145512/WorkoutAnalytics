@@ -49,7 +49,10 @@ def curl():
         stage               = "down"
         rep_count           = 0
         current_rep         = []
-        rep_duration        = time.time()
+        rep_start_time      = time.time()
+        rep_tempo           = 0
+        rep_min_angle       = 180
+        rep_max_angle       = 0
 
         with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
             while cap.isOpened():
@@ -123,12 +126,30 @@ def curl():
                 current_rep.append(features)
 
                 arm_angle = features["left_elbow_angle"]
+                if stage == "up":
+                    if arm_angle < rep_min_angle:
+                        rep_min_angle = arm_angle
+                    if arm_angle > rep_max_angle:
+                        rep_max_angle = arm_angle
+
                 if arm_angle < 40 and stage == "down":
                     stage = "up"
+                    rep_start_time = time.time()
+                    rep_min_angle = arm_angle
+                    rep_max_angle = arm_angle
+
                     #print("Up")
                 elif arm_angle > 150 and stage == "up":
                     stage = "down"
                     rep_count += 1
+
+                    rep_tempo = time.time() - rep_start_time
+                    range_of_motion = rep_max_angle - rep_min_angle
+                    print("rep :", rep_count)
+                    print("rep tempo :", rep_tempo)
+                    print("Max angle :", rep_max_angle)
+                    print("Min angle :", rep_min_angle)
+                    print("Range of motion :", range_of_motion)
                     #print("Down")
 
                     #print("Rep Done Total reps: ", rep_count)
