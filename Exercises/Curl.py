@@ -11,12 +11,13 @@ import csv
 import datetime
 import time
 
-from Utils import find_angle
+from Utils import find_angle, save_rep
 from Utils.show_points_and_lines import draw_points, connect_landmarks
 from Utils.find_angle import find_angle
 from Utils.spine import draw_spine
 from Utils.FindDistance import find_velocity
 from Utils.FindDistance import find_velocity_nodt
+from Utils.save_rep import save_rep
 
 mp_drawing  = mp.solutions.drawing_utils
 mp_pose     = mp.solutions.pose
@@ -26,17 +27,6 @@ cur_time    = datetime.datetime.now()
 filename    = os.path.join("exercise_hist","Curl",f"curl_{cur_time:%Y-%m-%d_%H-%M}.csv")
 
 def curl():
-    with open(filename, "w",newline="") as file:
-        writer = csv.writer(file)
-        writer.writerow(["Frame","Rep","Timestamp",
-            "Left Shoulder X","Left Shoulder Y","Left Elbow X","Left Elbow Y","Left Wrist X","Left Wrist Y",
-            "Right Shoulder X", "Right Shoulder Y","Right Elbow X", "Right Elbow Y","Right Wrist X","Right Wrist Y",
-            "Left Elbow Angle","Right Elbow Angle","Left Shoulder Angle","Right Shoulder Angle","Torso Angle",
-            "Left Angular Velocity","Right Angular Velocity",
-            "Left Wrist Velocity","Right Wrist Velocity",
-            "Left Elbow Velocity","Right Elbow Velocity",
-            "Left Elbow Drift", "Right Elbow Drift",
-            "Rep Tempo","Rep Min Angle","Rep Max Angle","Rep ROM"])
         # Initialise values
         start_time          = time.time()
         frame_count         = 0
@@ -144,10 +134,10 @@ def curl():
                         "timestamp": timestamp,
                         **features
                     })
-
+                
                     rep_min_angle = min(rep_min_angle, arm_angle)
                     rep_max_angle = max(rep_max_angle, arm_angle)
-
+                
                 # Finish rep
                 if arm_angle > curl_bottom and stage == "up":
                 
@@ -157,41 +147,14 @@ def curl():
                     rep_tempo = time.time() - rep_start_time
                     range_of_motion = rep_max_angle - rep_min_angle
 
-                    for frame in current_rep:
-                        writer.writerow([
-                            frame["frame"],
-                            rep_count,
-                            frame["timestamp"],
-                            frame["left_shoulder_x"],
-                            frame["left_shoulder_y"],
-                            frame["left_elbow_x"],
-                            frame["left_elbow_y"],
-                            frame["left_wrist_x"],
-                            frame["left_wrist_y"],
-                            frame["right_shoulder_x"],
-                            frame["right_shoulder_y"],
-                            frame["right_elbow_x"],
-                            frame["right_elbow_y"],
-                            frame["right_wrist_x"],
-                            frame["right_wrist_y"],
-                            frame["left_elbow_angle"],
-                            frame["right_elbow_angle"],
-                            frame["left_shoulder_angle"],
-                            frame["right_shoulder_angle"],
-                            frame["torso_angle"],
-                            frame["left_ang_velocity"],
-                            frame["right_ang_velocity"],
-                            frame["left_wrist_velocity"],
-                            frame["right_wrist_velocity"],
-                            frame["left_elbow_velocity"],
-                            frame["right_elbow_velocity"],
-                            frame["left_elbow_drift"],
-                            frame["right_elbow_drift"],
-                            rep_tempo,
-                            rep_min_angle,
-                            rep_max_angle,
-                            range_of_motion
-                        ])
+                    save_rep(
+                        current_rep,
+                        rep_count,
+                        rep_tempo,
+                        rep_min_angle,
+                        rep_max_angle,
+                        range_of_motion
+                    )
 
                     print("rep :", rep_count)
                     print("rep tempo :", rep_tempo)
