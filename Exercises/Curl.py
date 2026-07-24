@@ -123,19 +123,34 @@ def curl():
 
                 arm_angle = features["left_elbow_angle"]
 
+
+
+                # Start rep
                 if arm_angle < curl_top and stage == "down":
-                   
+                
                     stage = "up"
-            
                     rep_start_time = time.time()
-            
+
                     rep_min_angle = arm_angle
                     rep_max_angle = arm_angle
-            
+
                     current_rep = []
 
+                # Record every frame while curling
+                if stage == "up":
+                
+                    current_rep.append({
+                        "frame": frame_count,
+                        "timestamp": timestamp,
+                        **features
+                    })
 
-                elif arm_angle > curl_bottom and stage == "up":
+                    rep_min_angle = min(rep_min_angle, arm_angle)
+                    rep_max_angle = max(rep_max_angle, arm_angle)
+
+                # Finish rep
+                if arm_angle > curl_bottom and stage == "up":
+                
                     stage = "down"
                     rep_count += 1
 
@@ -189,16 +204,6 @@ def curl():
                     rep_min_angle = 180
                     rep_max_angle = 0
                     rep_start_time = None
-
-                    if stage == "up":
-                        current_rep.append({
-                            "frame": frame_count,
-                            "timestamp": timestamp,
-                            **features
-                    })
-                    rep_min_angle = min(rep_min_angle, arm_angle)
-                    rep_max_angle = max(rep_max_angle, arm_angle)
-                    #print("Up")
 
                     #print("Rep Done Total reps: ", rep_count)
                 cv2.imshow("Real time window", image)
