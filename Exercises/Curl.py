@@ -35,10 +35,11 @@ def curl():
             "Left Angular Velocity","Right Angular Velocity",
             "Left Wrist Velocity","Right Wrist Velocity",
             "Left Elbow Velocity","Right Elbow Velocity",
-            "Left Elbow Drift", "Right Elbow Drift"])
+            "Left Elbow Drift", "Right Elbow Drift",
+            "Rep Tempo","Rep Min Angle","Rep Max Angle","Rep ROM"])
         # Initialise values
         start_time          = time.time()
-        frame_count         = 1
+        frame_count         = 0
         prev_left_angle     = None
         prev_right_angle    = None
         prev_left_wrist     = None
@@ -49,10 +50,12 @@ def curl():
         stage               = "down"
         rep_count           = 0
         current_rep         = []
-        rep_start_time      = time.time()
+        rep_start_time      = None
         rep_tempo           = 0
         rep_min_angle       = 180
         rep_max_angle       = 0
+        curl_top            = 40
+        curl_bottom         = 150
 
         with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
             while cap.isOpened():
@@ -90,10 +93,6 @@ def curl():
                 
                 # Write into CSV
                 if features:
-                    writer.writerow(
-                        [frame_count, rep_count, timestamp] +
-                        list(features.values())
-                    )
 
                     # Set new prev values using current ones
                     prev_time = timestamp
@@ -121,36 +120,85 @@ def curl():
                     )
 
                     frame_count += 1
-                
-                # Rep counter
-                current_rep.append(features)
 
                 arm_angle = features["left_elbow_angle"]
-                if stage == "up":
-                    if arm_angle < rep_min_angle:
-                        rep_min_angle = arm_angle
-                    if arm_angle > rep_max_angle:
-                        rep_max_angle = arm_angle
 
-                if arm_angle < 40 and stage == "down":
+                if arm_angle < curl_top and stage == "down":
+                   
                     stage = "up"
+            
                     rep_start_time = time.time()
+            
                     rep_min_angle = arm_angle
                     rep_max_angle = arm_angle
+            
+                    current_rep = []
 
-                    #print("Up")
-                elif arm_angle > 150 and stage == "up":
+
+                elif arm_angle > curl_bottom and stage == "up":
                     stage = "down"
                     rep_count += 1
 
                     rep_tempo = time.time() - rep_start_time
                     range_of_motion = rep_max_angle - rep_min_angle
+
+                    for frame in current_rep:
+                        writer.writerow([
+                            frame["frame"],
+                            rep_count,
+                            frame["timestamp"],
+                            frame["left_shoulder_x"],
+                            frame["left_shoulder_y"],
+                            frame["left_elbow_x"],
+                            frame["left_elbow_y"],
+                            frame["left_wrist_x"],
+                            frame["left_wrist_y"],
+                            frame["right_shoulder_x"],
+                            frame["right_shoulder_y"],
+                            frame["right_elbow_x"],
+                            frame["right_elbow_y"],
+                            frame["right_wrist_x"],
+                            frame["right_wrist_y"],
+                            frame["left_elbow_angle"],
+                            frame["right_elbow_angle"],
+                            frame["left_shoulder_angle"],
+                            frame["right_shoulder_angle"],
+                            frame["torso_angle"],
+                            frame["left_ang_velocity"],
+                            frame["right_ang_velocity"],
+                            frame["left_wrist_velocity"],
+                            frame["right_wrist_velocity"],
+                            frame["left_elbow_velocity"],
+                            frame["right_elbow_velocity"],
+                            frame["left_elbow_drift"],
+                            frame["right_elbow_drift"],
+                            rep_tempo,
+                            rep_min_angle,
+                            rep_max_angle,
+                            range_of_motion
+                        ])
+
                     print("rep :", rep_count)
                     print("rep tempo :", rep_tempo)
                     print("Max angle :", rep_max_angle)
                     print("Min angle :", rep_min_angle)
                     print("Range of motion :", range_of_motion)
                     #print("Down")
+
+                    current_rep.clear()
+                    rep_min_angle = 180
+                    rep_max_angle = 0
+                    rep_start_time = None
+
+                    if stage == "up":
+                        current_rep.append({
+                            "frame": frame_count,
+                            "timestamp": timestamp,
+                            **features
+                    })
+                    rep_min_angle = min(rep_min_angle, arm_angle)
+                    rep_max_angle = max(rep_max_angle, arm_angle)
+                    #print("Up")
 
                     #print("Rep Done Total reps: ", rep_count)
                 cv2.imshow("Real time window", image)
