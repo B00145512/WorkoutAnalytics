@@ -10,7 +10,7 @@ def save_rep(current_rep, rep_number, rep_tempo, rep_min_angle, rep_max_angle, r
     with open(filename, mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow([
-            "Frame","Timestamp",
+            "Frame","Timestamp", "Rep Duration",
             "Left Shoulder X","Left Shoulder Y",
             "Left Elbow X","Left Elbow Y",
             "Left Wrist X","Left Wrist Y",
@@ -30,9 +30,11 @@ def save_rep(current_rep, rep_number, rep_tempo, rep_min_angle, rep_max_angle, r
             "Rep ROM"
         ])
         for frame in current_rep:
+            rep_duration = frame["timestamp"] - current_rep[0]["timestamp"]
             writer.writerow([
                 frame["frame"],
                 frame["timestamp"],
+                rep_duration,
                 frame["left_shoulder_x"],
                 frame["left_shoulder_y"],
                 frame["left_elbow_x"],

@@ -26,5 +26,4 @@ squat_button = Button(select_window, text="Squat")
 squat_button.config(command=squat, font=("Ariel", 15, "bold"), activebackground="#ffeaea", compound="left")
 squat_button.pack()
 
-select_window.mainloop()
-'''
+select_window.mainloop()'''
