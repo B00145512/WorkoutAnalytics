@@ -22,7 +22,7 @@ from Utils.save_rep import save_rep
 mp_drawing  = mp.solutions.drawing_utils
 mp_pose     = mp.solutions.pose
 detector    = PoseDetector()
-cap         = cv2.VideoCapture(0)
+cap         = cv2.VideoCapture(2)
 cur_time    = datetime.datetime.now()
 filename    = os.path.join("exercise_hist","Curl",f"curl_{cur_time:%Y-%m-%d_%H-%M}.csv")
 
@@ -83,37 +83,19 @@ def curl():
                 
                 # Write into CSV
                 if features:
-
                     # Set new prev values using current ones
                     prev_time = timestamp
                     prev_left_angle = features["left_elbow_angle"]
                     prev_right_angle = features["right_elbow_angle"]
 
-                    prev_left_wrist = (
-                        features["left_wrist_x"],
-                        features["left_wrist_y"]
-                    )
-
-                    prev_right_wrist = (
-                        features["right_wrist_x"],
-                        features["right_wrist_y"]
-                    )
-
-                    prev_left_elbow = (
-                        features["left_elbow_x"],
-                        features["left_elbow_y"]
-                    )
-
-                    prev_right_elbow = (
-                        features["right_elbow_x"],
-                        features["right_elbow_y"]
-                    )
+                    prev_left_wrist = (features["left_wrist_x"],features["left_wrist_y"])
+                    prev_right_wrist = (features["right_wrist_x"],features["right_wrist_y"])
+                    prev_left_elbow = (features["left_elbow_x"],features["left_elbow_y"])
+                    prev_right_elbow = (features["right_elbow_x"],features["right_elbow_y"])
 
                     frame_count += 1
 
                 arm_angle = features["left_elbow_angle"]
-
-
 
                 # Start rep
                 if arm_angle < curl_top and stage == "down":
@@ -167,7 +149,7 @@ def curl():
                     rep_min_angle = 180
                     rep_max_angle = 0
                     rep_start_time = None
-
+                    time.sleep(0.5)
                     #print("Rep Done Total reps: ", rep_count)
                 cv2.imshow("Real time window", image)
 

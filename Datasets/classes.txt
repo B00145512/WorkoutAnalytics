@@ -1,0 +1,7 @@
+0 = Correct
+1 = Fatigue
+2 = Elbow sway
+3 = bad back posture
+
+each contain slight angle, front, side shots
+from a lower view and upper view
