@@ -22,7 +22,7 @@ from Utils.save_rep import save_rep
 mp_drawing  = mp.solutions.drawing_utils
 mp_pose     = mp.solutions.pose
 detector    = PoseDetector()
-cap         = cv2.VideoCapture(2)
+cap         = cv2.VideoCapture(0)
 cur_time    = datetime.datetime.now()
 filename    = os.path.join("exercise_hist","Curl",f"curl_{cur_time:%Y-%m-%d_%H-%M}.csv")
 
