@@ -12,8 +12,8 @@ def draw_points(image, l, label, w, h):
     cv2.putText(image, label, (x_px + 6, y_px - 6),
     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
-def connect_landmarks(image, point1, point2, w, h):
+def connect_landmarks(image, point1, point2, w, h, color=(100, 255, 100), thickness=2):
         x1, y1 = to_pixel(point1, w, h)
         x2, y2 = to_pixel(point2, w, h)
 
-        cv2.line(image, (x1, y1), (x2, y2), (100, 255, 100), 2)
+        cv2.line(image, (x1, y1), (x2, y2), color, thickness)

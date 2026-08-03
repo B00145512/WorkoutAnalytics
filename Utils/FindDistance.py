@@ -33,3 +33,13 @@ def pyth(dx, dy):
     dy: difference in y coordinates
     """
     return np.sqrt(dx ** 2 + dy ** 2)
+
+def find_distance(p1, p2):
+    """
+    Find distance between two points
+    p1: first point (x, y)
+    p2: second point (x, y)
+    """
+    dx = p1[0] - p2[0]
+    dy = p1[1] - p2[1]
+    return pyth(dx, dy)

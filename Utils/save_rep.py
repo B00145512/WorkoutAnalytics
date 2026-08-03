@@ -24,16 +24,24 @@ def save_rep(current_rep, rep_number, rep_tempo, rep_min_angle, rep_max_angle, r
             "Left Wrist Velocity","Right Wrist Velocity",
             "Left Elbow Velocity","Right Elbow Velocity",
             "Left Elbow Drift","Right Elbow Drift",
-            "Rep Tempo",
-            "Rep Min Angle",
-            "Rep Max Angle",
-            "Rep ROM"
+            "Rep Tempo","Rep Min Angle","Rep Max Angle","Rep ROM"
         ])
-        for frame in current_rep:
-            rep_duration = frame["timestamp"] - current_rep[0]["timestamp"]
+
+        # Making sure timestamp exists
+        if "timestamp" not in current_rep[0]:
+            raise ValueError("Missing 'timestamp' in current_rep. Fix Curl.py append.")
+
+        start_time = current_rep[0]["timestamp"]
+
+        # Write rows for each frame in the current_rep
+        for i, frame in enumerate(current_rep):
+
+            timestamp = frame["timestamp"]
+            rep_duration = timestamp - start_time
+
             writer.writerow([
-                frame["frame"],
-                frame["timestamp"],
+                i,
+                timestamp,
                 rep_duration,
                 frame["left_shoulder_x"],
                 frame["left_shoulder_y"],
