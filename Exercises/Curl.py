@@ -41,6 +41,17 @@ model.eval()
 mean = np.load("norm_mean.npy")
 std = np.load("norm_std.npy")
 
+labels = {
+    0: "Perfect",
+    1: "Fatigue",
+    2: "Elbow Sway"
+}
+feedback_messages = {
+    0: "Good Form",
+    1: "Fatigue Detected, try to rest or lower weight",
+    2: "Elbow Sway Detected, keep your elbows close to your body"
+}
+
 def curl():
 
     start_time          = time.time()
@@ -159,16 +170,23 @@ def curl():
 
                 sequence = fix_sequence_length(sequence)
 
-                print("Sequence shape:", sequence.shape)  # should be (151,25)
+                #print("Sequence shape:", sequence.shape)  # should be (151,25)
 
                 prediction = predict_rep_lstm(sequence, model, mean, std)
+                pred = prediction.argmax()  # Get the index of the highest probability
+                conf = prediction[pred]  # Get the confidence of the predicted class
 
-                print("\n--------------------------")
+                print("\n------------Curl Information------------")
                 print(f"Rep: {rep_count}")
-                print(f"Prediction: {prediction}")
-                print(f"Tempo: {rep_tempo:.2f}")
-                print(f"ROM: {rom:.2f}")
-                print("--------------------------\n")
+                print(f"Time: {rep_tempo:.2f} seconds")
+                print(f"Range of Motion: {rom:.2f} degrees")
+                print(f"Min Angle: {rep_min_angle:.2f} degrees", f"Max Angle: {rep_max_angle:.2f} degrees")
+                for i in range(len(prediction)):
+                    print(f"{labels[i]}: {prediction[i]*100:.1f}%")
+                print("--------------Curl Feedback--------------\n")
+                print(f"Detected: {labels[pred]} with {conf*100:.1f}%")
+                print(f"Feedback: {feedback_messages[pred]}")
+                print("-----------------------------------------\n")
 
                 current_rep.clear()
                 rep_min_angle = 180

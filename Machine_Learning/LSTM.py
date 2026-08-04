@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+import torch.nn.functional as F
 
 def predict_rep_lstm(sequence, model, mean, std):
     sequence = (sequence - mean) / std
@@ -8,16 +9,16 @@ def predict_rep_lstm(sequence, model, mean, std):
 
     # ensure shape is (151, 25)
     if tensor.ndim == 2:
-        tensor = tensor.unsqueeze(0)   # → (1, 151, 25)
+        tensor = tensor.unsqueeze(0)
 
 # if already 3D, do nothing
 
     model.eval()
     with torch.no_grad():
         output = model(tensor)
-        pred = torch.argmax(output, dim=1).item()
+        pred = F.softmax(output, dim=1) # softmax for probabilities
 
-    return pred
+    return pred[0].cpu().numpy()
 
 def fix_sequence_length(seq):
     if len(seq) > 151:
