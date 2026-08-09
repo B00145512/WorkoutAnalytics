@@ -15,6 +15,8 @@ from Utils.save_rep import save_rep
 from Machine_Learning.LSTM import predict_rep_lstm, fix_sequence_length
 from Machine_Learning.ML_MULTIROW import CurlLSTM
 
+from Vis.save_summary import init_summary, append_summary
+
 mp_pose = mp.solutions.pose
 cap = cv2.VideoCapture(0)
 
@@ -72,6 +74,8 @@ def curl():
     curl_top            = 40
     curl_bottom         = 150
     baseline_spine_dist = None
+    
+    init_summary()
 
     with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
         while cap.isOpened():
@@ -175,6 +179,9 @@ def curl():
                 prediction = predict_rep_lstm(sequence, model, mean, std)
                 pred = prediction.argmax()  # Get the index of the highest probability
                 conf = prediction[pred]  # Get the confidence of the predicted class
+
+                # Write to summaryCSV
+                append_summary(rep_count, pred, conf, prediction, rep_tempo, rom, labels)
 
                 print("\n------------Curl Information------------")
                 print(f"Rep: {rep_count}")
