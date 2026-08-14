@@ -17,7 +17,7 @@ def init_summary(SUMMARY_FILE):
                 "Confidence",
                 "Perfect %",
                 "Fatigue %",
-                "Postuire %",
+                "Posture %",
                 "Tempo", 
                 "ROM"])
 

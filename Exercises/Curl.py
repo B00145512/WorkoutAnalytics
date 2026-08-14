@@ -5,6 +5,7 @@ import mediapipe as mp
 import datetime
 import time
 import torch
+import os
 
 from Utils.show_points_and_lines import draw_points, connect_landmarks
 from Utils.find_angle import find_angle
@@ -18,7 +19,7 @@ from Machine_Learning.ML_MULTIROW import CurlLSTM
 from Vis.save_summary import init_summary, append_summary
 
 mp_pose = mp.solutions.pose
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 FRAME_FEATURES = [
     "left_shoulder_x","left_shoulder_y",
@@ -75,7 +76,11 @@ def curl():
     curl_bottom         = 150
     baseline_spine_dist = None
     
-    init_summary()
+    SUMMARY_DIR = os.path.join("Datasets", "exercise_hist")
+    os.makedirs(SUMMARY_DIR, exist_ok=True)
+    SUMMARY_FILE = os.path.join(SUMMARY_DIR,"workout_summary.csv")
+
+    init_summary(SUMMARY_FILE)
 
     with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
         while cap.isOpened():
