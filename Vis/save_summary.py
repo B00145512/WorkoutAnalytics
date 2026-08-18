@@ -2,24 +2,23 @@ import csv
 import os
 from datetime import datetime
 
-SUMMARY_FILE = os.path.join("exercise_hist", f"summary_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.csv")
+SUMMARY_FILE = os.path.join("Datasets", "exercise_hist", f"summary_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.csv")
 
-def init_summary(SUMMARY_FILE):
-    os.makedirs("exercise_hist", exist_ok=True)
+def init_summary():
+    os.makedirs(os.path.dirname(SUMMARY_FILE), exist_ok=True)
+    with open(SUMMARY_FILE, mode='w', newline='') as file:
+        writer = csv.writer(file)
 
-    if not os.path.exists(SUMMARY_FILE):
-        with open(SUMMARY_FILE, mode='w', newline='') as file:
-            writer = csv.writer(file)
-
-            writer.writerow([
-                "Rep",
-                "Prediction",
-                "Confidence",
-                "Perfect %",
-                "Fatigue %",
-                "Posture %",
-                "Tempo", 
-                "ROM"])
+        writer.writerow([
+            "Rep",
+            "Prediction",
+            "Confidence",
+            "Perfect %",
+            "Fatigue %",
+            "Posture %",
+            "Tempo",
+            "ROM"
+        ])
 
 def append_summary(rep, pred, conf, probs, tempo, rom, labels):
     with open(SUMMARY_FILE, "a", newline="") as f:
