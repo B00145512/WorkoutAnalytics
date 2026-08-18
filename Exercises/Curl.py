@@ -1,11 +1,8 @@
-import os.path
 import cv2
 import numpy as np
 import mediapipe as mp
-import datetime
 import time
 import torch
-import os
 
 from Utils.show_points_and_lines import draw_points, connect_landmarks
 from Utils.find_angle import find_angle
@@ -19,7 +16,12 @@ from Machine_Learning.ML_MULTIROW import CurlLSTM
 from Vis.save_summary import init_summary, append_summary
 
 mp_pose = mp.solutions.pose
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture("test334.mp4")
+
+fps = cap.get(cv2.CAP_PROP_FPS)
+frame_delay = int(1000 / fps)
+
+print("Video FPS:", fps)
 
 FRAME_FEATURES = [
     "left_shoulder_x","left_shoulder_y",
@@ -76,11 +78,7 @@ def curl():
     curl_bottom         = 150
     baseline_spine_dist = None
     
-    SUMMARY_DIR = os.path.join("Datasets", "exercise_hist")
-    os.makedirs(SUMMARY_DIR, exist_ok=True)
-    SUMMARY_FILE = os.path.join(SUMMARY_DIR,"workout_summary.csv")
-
-    init_summary(SUMMARY_FILE)
+    init_summary()
 
     with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
         while cap.isOpened():
@@ -114,7 +112,7 @@ def curl():
             #If no features are found, continue without writing to CSV
             if features is None:
                 cv2.imshow("Real time window", image)
-                if cv2.waitKey(5) & 0xFF == ord('q'):
+                if cv2.waitKey(60) & 0xFF == ord('q'):
                     break
                 continue
 
@@ -207,7 +205,7 @@ def curl():
 
             cv2.imshow("Real time window", image)
 
-            if cv2.waitKey(5) & 0xFF == ord("q"):
+            if cv2.waitKey(frame_delay) & 0xFF == ord("q"):
                 break
 
         cap.release()

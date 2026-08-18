@@ -1,7 +1,6 @@
 from time import sleep
 from tkinter import *
 from Exercises.Curl import curl
-sleep(2)
 curl()
 ## Start by showing a window to select exercise
 #

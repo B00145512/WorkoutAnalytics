@@ -1,3 +1,4 @@
+# LSTM Training
 import glob
 import os
 import pandas as pd
@@ -19,6 +20,20 @@ CLASS_FOLDER_TO_LABEL = {
 }
 
 MAX_FRAMES = 151
+NUM_CLASSES = 3
+HIDDEN_SIZE = 64
+DROPOUT = 0.3
+LEARNING_RATE = 0.001
+BATCH_SIZE = 16
+TEST_SIZE = 0.2
+RANDOM_STATE = 42
+EPOCHS = 20
+# 25 input features
+# 151 sequence length
+# 1 LSTM layer
+# ADAM optimizer
+# CrossEntropyLoss
+# 80/20 split
 
 FRAME_FEATURES = [
     "Left Shoulder X","Left Shoulder Y",
@@ -36,9 +51,8 @@ FRAME_FEATURES = [
     "Left Elbow Drift","Right Elbow Drift"
 ]
 
-# ---------------------------
 # LOAD + PAD SEQUENCES
-# ---------------------------
+
 def load_sequence(filepath, label):
     df = pd.read_csv(filepath)
 
@@ -73,16 +87,14 @@ def build_sequence_dataset(root):
     return np.array(X_all), np.array(y_all)
 
 
-# ---------------------------
-# MODEL
-# ---------------------------
+# Model
 class CurlLSTM(nn.Module):
-    def __init__(self, input_size, hidden_size=64, num_classes=3):
+    def __init__(self, input_size, hidden_size=HIDDEN_SIZE, num_classes=NUM_CLASSES):
         super().__init__()
 
-        self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True)
-        self.dropout = nn.Dropout(0.3)
-        self.fc = nn.Linear(hidden_size, num_classes)
+        self.lstm = nn.LSTM(input_size, HIDDEN_SIZE, batch_first=True)
+        self.dropout = nn.Dropout(DROPOUT)
+        self.fc = nn.Linear(HIDDEN_SIZE, NUM_CLASSES)
 
     def forward(self, x):
         out, _ = self.lstm(x)
@@ -91,9 +103,8 @@ class CurlLSTM(nn.Module):
         return out
 
 
-# ---------------------------
-# MAIN TRAINING
-# ---------------------------
+# Training
+
 if __name__ == "__main__":
 
     print("Loading dataset...")
@@ -101,49 +112,40 @@ if __name__ == "__main__":
 
     print("Dataset shape:", X.shape)  # (N, 151, features)
 
-    # ---------------------------
-    # NORMALIZATION
-    # ---------------------------
+
+    # normalization
+
     mean = X.mean(axis=(0, 1), keepdims=True)
     std = X.std(axis=(0, 1), keepdims=True) + 1e-6
     X = (X - mean) / std
 
-    # ---------------------------
-    # SPLIT
-    # ---------------------------
+    # split into train/test
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, stratify=y, random_state=42
+        X, y, test_size=TEST_SIZE, stratify=y, random_state=RANDOM_STATE
     )
 
-    # ---------------------------
-    # TENSORS
-    # ---------------------------
+    # Tensors
     X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
     y_train_tensor = torch.tensor(y_train, dtype=torch.long)
 
     X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
     y_test_tensor = torch.tensor(y_test, dtype=torch.long)
 
-    # ---------------------------
-    # DATALOADER
-    # ---------------------------
+    # DataLoader
     train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
-    train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
-    # ---------------------------
-    # MODEL SETUP
-    # ---------------------------
+    # model setup
+
     model = CurlLSTM(input_size=len(FRAME_FEATURES))
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
-    # ---------------------------
-    # TRAINING LOOP
-    # ---------------------------
+    # training loop
     print("Training...")
 
-    for epoch in range(20):
+    for epoch in range(EPOCHS):
         model.train()
         total_loss = 0
 
@@ -159,9 +161,7 @@ if __name__ == "__main__":
 
         print(f"Epoch {epoch+1}, Loss: {total_loss:.4f}")
 
-    # ---------------------------
-    # EVALUATION
-    # ---------------------------
+# Evaluation
     model.eval()
 
     with torch.no_grad():
@@ -172,9 +172,7 @@ if __name__ == "__main__":
 
     print("Test Accuracy:", accuracy.item())
 
-    # ---------------------------
-    # SAVE MODEL
-    # ---------------------------
+    # SAVE MODEl
     torch.save(model.state_dict(), "curl_lstm.pth")
     np.save("norm_mean.npy", mean)
     np.save("norm_std.npy", std)
