@@ -111,8 +111,21 @@ wrist_df = pd.concat([
         .rename(columns={"Right Wrist X": "X", "Right Wrist Y": "Y"})
         .assign(Wrist="Right")
 ])
+
+# Elbow movement path + height
+elbow_df = pd.concat([
+    all_reps_df[["Rep", "Timestamp", "Left Elbow X", "Left Elbow Y"]]
+        .rename(columns={"Left Elbow X": "X", "Left Elbow Y": "Y"})
+        .assign(Elbow="Left"),
+
+    all_reps_df[["Rep", "Timestamp", "Right Elbow X", "Right Elbow Y"]]
+        .rename(columns={"Right Elbow X": "X", "Right Elbow Y": "Y"})
+        .assign(Elbow="Right")
+])
 # Start each rep's time from 0
 wrist_df["Time"] = wrist_df.groupby(["Rep", "Wrist"])["Timestamp"].transform(lambda x: x - x.min())
+elbow_df["Time"] = elbow_df.groupby(["Rep", "Elbow"])["Timestamp"].transform(lambda x: x)
+
 
 # Column 1, wrist loaction scatter plot
 with col1:
@@ -129,6 +142,19 @@ with col1:
 
     st.altair_chart(chart, width="stretch")
 
+    st.subheader("Elbow Movement Path")
+
+    chart = alt.Chart(elbow_df).mark_circle(
+        opacity=0.45
+    ).encode(
+        x=alt.X("X:Q", title="Horizontal Position"),
+        y=alt.Y("Y:Q", title="Vertical Position", scale=alt.Scale(reverse=True)),
+        color=alt.Color("Rep:N"),
+        shape=alt.Shape("Elbow:N"),
+        tooltip=["Rep", "Elbow", "X", "Y"])
+
+    st.altair_chart(chart, width="stretch")
+
 # column 2 wrist height over time
 with col2:
     st.subheader("Wrist Height Over Time")
@@ -141,5 +167,19 @@ with col2:
         color=alt.Color("Rep:N"),
         strokeDash=alt.StrokeDash("Wrist:N"),
         tooltip=["Rep", "Wrist", "Time", "Y"])
+
+    st.altair_chart(chart, width="stretch")
+
+with col2:
+    st.subheader("Elbow Sway Over Time")
+
+    chart = alt.Chart(elbow_df).mark_circle(
+        opacity=0.5
+    ).encode(
+        x=alt.X("Time:Q", title="Time (seconds)"),
+        y=alt.Y("Y:Q", title="Elbow Sway", scale=alt.Scale(reverse=True)),
+        color=alt.Color("Rep:N"),
+        strokeDash=alt.StrokeDash("Elbow:N"),
+        tooltip=["Rep", "Elbow", "Time", "Y"])
 
     st.altair_chart(chart, width="stretch")
